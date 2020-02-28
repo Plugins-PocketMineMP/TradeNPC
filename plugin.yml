@@ -1,0 +1,11 @@
+name: TradeNPC
+author: alvin0319
+main: TradeNPC\Main
+version: 1.0.0
+api:
+  - 3.0.0
+
+commands:
+  npc:
+    description: NPC command
+    permission: op
