@@ -65,6 +65,7 @@ class Main extends PluginBase implements Listener {
 	}
 
 	public function onInteract(PlayerInteractEvent $event) {
+		if($event->getAction() == PlayerInteractEvent::RIGHT_CLICK_BLOCK){
 		$player = $event->getPlayer();
 		if (isset(TradeDataPool::$editNPCData[$player->getName()])) {
 			$m = (int) TradeDataPool::$editNPCData[$player->getName()] ["step"];
@@ -85,6 +86,7 @@ class Main extends PluginBase implements Listener {
 				$player->sendMessage("엔티티를 터치해주세요.");
 				return;
 			}
+		}
 		}
 	}
 
