@@ -29,7 +29,7 @@ class TradeInventory extends ContainerInventory
 
 	public function getDefaultSize(): int
 	{
-		return 27;
+		return 3; // TODO: Enable the slot 2
 	}
 
 	public function getNetworkType(): int
