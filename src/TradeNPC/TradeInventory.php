@@ -44,8 +44,8 @@ class TradeInventory extends ContainerInventory
 		$pk = new UpdateTradePacket();
 		$pk->displayName = $this->npc->getName();
 		$pk->windowId = $id = $who->getWindowId($this);
-		$pk->isWilling = false;
-		$pk->isV2Trading = false;
+		$pk->isWilling = true;
+		$pk->isV2Trading = true;
 		$pk->tradeTier = 1;
 		$pk->playerEid = $who->getId();
 		$pk->traderEid = $this->npc->getId();

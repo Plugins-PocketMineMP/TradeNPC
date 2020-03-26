@@ -43,6 +43,7 @@ class Main extends PluginBase implements Listener
 
 	public function onEnable()
 	{
+		$this->saveResource("config.yml");
 		Entity::registerEntity(TradeNPC::class, true, ["tradenpc"]);
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 	}
@@ -62,10 +63,12 @@ class Main extends PluginBase implements Listener
 	public function onMove(PlayerMoveEvent $event)
 	{
 		$player = $event->getPlayer();
-		foreach ($player->getLevel()->getEntities() as $entity) {
-			if ($entity instanceof TradeNPC) {
-				if ($player->distance($entity) <= 5) {
-					$entity->lookAt($player);
+		if ($this->getConfig()->getNested("enable-see-player", false)){
+			foreach ($player->getLevel()->getEntities() as $entity) {
+				if ($entity instanceof TradeNPC) {
+					if ($player->distance($entity) <= 5) {
+						$entity->lookAt($player);
+					}
 				}
 			}
 		}
@@ -190,8 +193,10 @@ class Main extends PluginBase implements Listener
 				if ($data instanceof CompoundTag) {
 					$buy = Item::nbtDeserialize($data->getCompoundTag("buyA"));
 					$sell = Item::nbtDeserialize($data->getCompoundTag("sell"));
-					$player->getInventory()->removeItem($buy);
-					$player->getInventory()->addItem($sell);
+					if ($player->getInventory()->contains($buy)) {// Prevents https://github.com/alvin0319/TradeNPC/issues/3
+						$player->getInventory()->removeItem($buy);
+						$player->getInventory()->addItem($sell);
+					}
 				}
 				unset(TradeDataPool::$interactNPCData[$player->getName()]);
 			}
@@ -202,10 +207,8 @@ class Main extends PluginBase implements Listener
 				foreach ($packet->actions as $action) {
 					if ($action instanceof NetworkInventoryAction) {
 						if (isset(TradeDataPool::$windowIdData[$player->getName()]) and $action->windowId === TradeDataPool::$windowIdData[$player->getName()]) {
-							if ($player->getInventory()->contains($action->oldItem)) { // Prevents https://github.com/alvin0319/TradeNPC/issues/3
-								$player->getInventory()->addItem($action->oldItem);
-								$player->getInventory()->removeItem($action->newItem);
-							}
+							$player->getInventory()->addItem($action->oldItem);
+							$player->getInventory()->removeItem($action->newItem);
 						}
 					}
 				}
@@ -230,6 +233,12 @@ class Main extends PluginBase implements Listener
 						if ((int)$this->deviceOSData[strtolower($player->getName())] === 7) {
 							$player->sendMessage("You can't use this that you are in Windows 10.");
 							return;
+						}
+						if ($player->isCreative()) {
+							if (!$this->getConfig()->getNested("enable-open-shop-creative")) {
+								$player->sendMessage("You can't use this that you are in Creative mode.");
+								return;
+							}
 						}
 						$player->addWindow($entity->getTradeInventory());
 					}

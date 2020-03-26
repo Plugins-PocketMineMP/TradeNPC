@@ -11,6 +11,7 @@ use pocketmine\nbt\LittleEndianNBTStream;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
+use pocketmine\nbt\tag\StringTag;
 
 class TradeNPC extends Human implements PMNPC
 {
@@ -26,6 +27,7 @@ class TradeNPC extends Human implements PMNPC
 			new ByteTag("rewardExp", 0),
 			$sell->nbtSerialize(-1, "sell"),
 			new IntTag("uses", 0),
+			new StringTag("label", "gg")
 		]);
 	}
 
