@@ -18,11 +18,18 @@ use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\network\mcpe\protocol\ActorEventPacket;
+use pocketmine\network\mcpe\protocol\ContainerClosePacket;
 use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
 use pocketmine\network\mcpe\protocol\LoginPacket;
 use pocketmine\network\mcpe\protocol\types\NetworkInventoryAction;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
+use function array_shift;
+use function file_exists;
+use function file_get_contents;
+use function file_put_contents;
+use function strtolower;
+use function unlink;
 
 class Main extends PluginBase implements Listener
 {
@@ -154,7 +161,7 @@ class Main extends PluginBase implements Listener
 				$sender->sendMessage("Removed.");
 				foreach ($this->getServer()->getLevels() as $level) {
 					foreach ($level->getEntities() as $entity) {
-						if ($entity instanceof NPC) {
+						if ($entity instanceof TradeNPC) {
 							if ($entity->getNameTag() === $name) {
 								$entity->close();
 								break;
@@ -248,6 +255,13 @@ class Main extends PluginBase implements Listener
 		if ($packet instanceof LoginPacket) {
 			$device = (int)$packet->clientData["DeviceOS"];
 			$this->deviceOSData[strtolower($packet->username)] = $device;
+		}
+		if ($packet instanceof ContainerClosePacket) {
+			if (isset(TradeDataPool::$windowIdData[$player->getName()])) {
+				$pk = new ContainerClosePacket();
+				$pk->windowId = 255; // ??
+				$player->sendDataPacket($pk);
+			}
 		}
 	}
 
